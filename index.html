@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>E36 Part Picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceae4;--surface:#fbfaf7;--ink:#14232b;--muted:#5d6b72;--line:#d3d0c6;--accent:#f2b705;--bad:#b3261e;--good:#1d7a46;--warn:#9a6700;--link:#1a5fb4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a20;--surface:#162830;--ink:#e9eef0;--muted:#93a5ad;--line:#2b414b;--bad:#ff8a80;--good:#6fd69b;--warn:#f2b705;--link:#8ab4f8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1a20;--surface:#162830;--ink:#e9eef0;--muted:#93a5ad;--line:#2b414b;--bad:#ff8a80;--good:#6fd69b;--warn:#f2b705;--link:#8ab4f8;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.45 Barlow,system-ui,sans-serif}
+h1,h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;margin:0}
+header,main{max-width:1080px;margin:0 auto;padding:0 20px}header{padding-top:26px}
+h1{font-size:46px;line-height:1}header p{color:var(--muted);margin:6px 0 12px;max-width:62ch}
+main{display:grid;gap:14px;padding-bottom:40px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.base{padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select,input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+button,.btn{font:inherit;font-weight:600;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 10px;text-decoration:none;display:inline-block;font-size:14px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.pick{background:var(--accent);border-color:var(--accent);color:#14232b}
+.table{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:680px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font:600 17px "Barlow Condensed",sans-serif;color:var(--muted)}tr:last-child td{border-bottom:0}
+td.cat{font:600 19px "Barlow Condensed",sans-serif;white-space:nowrap}td.num{text-align:right;white-space:nowrap}
+.sub{color:var(--muted);font-size:13px}.rm{color:var(--bad)}a{color:var(--link)}
+.totals{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.totals b{display:block;font:700 34px/1 "Barlow Condensed",sans-serif}.totals span{color:var(--muted);font-size:13px}
+.notes{padding:12px 16px}.notes h2{font-size:22px;margin-bottom:4px}.notes li{margin:4px 0}
+.w{color:var(--warn)}.e{color:var(--bad)}.ok{color:var(--good)}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);width:min(760px,94vw);padding:0;max-height:88vh}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dh{padding:12px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface)}
+.dh h2{font-size:24px;flex:1;min-width:160px}
+.item{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.item .info{flex:1;min-width:200px}.dis{opacity:.45}
+.cm{padding:10px 16px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.cm p{margin:2px 0 0;white-space:pre-wrap}
+.form{padding:12px 16px;display:grid;gap:8px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;display:none}
+[hidden]{display:none!important}
+.top{background:#0b161b;color:#e9eef0;position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top,0px)}
+.top div{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;gap:6px 16px;align-items:center;flex-wrap:wrap}
+.top a,.top button{color:#e9eef0;text-decoration:none;background:none;border:0;font-weight:600;padding:6px 4px;cursor:pointer;font-size:15px}
+.top .brand{font:700 24px "Barlow Condensed",sans-serif;margin-right:auto;padding-right:12px}
+.top .start{background:var(--accent);color:#14232b;border-radius:6px;padding:7px 12px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 40px;display:grid;gap:28px}
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center;padding:36px 0 4px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(40px,7vw,68px)}.hero p{font-size:17px;color:var(--muted);max-width:50ch}
+.big{font-size:18px;padding:12px 20px}
+.snap{padding:18px}.snap b{font:700 40px/1 "Barlow Condensed",sans-serif}.snap div.g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.three .card,.cards .card{padding:16px}
+.sec h2{font-size:30px;margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.cards h3{font:700 22px "Barlow Condensed",sans-serif;margin:0 0 4px}
+.tile{text-align:left;padding:14px;width:100%}.tile b{display:block;font:600 19px "Barlow Condensed",sans-serif}
+footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<nav class="top"><div><a class="brand" href="#home">E36 Part Picker</a><a href="#builder">System Builder</a><button data-go="featured">Completed builds</button><button data-go="cats">Browse parts</button><button data-go="guides">Guides</button><button id="navcm">Discussion</button><a class="start" href="#builder">Start your build</a></div></nav>
+<div id="home"><div class="wrap">
+<section class="hero"><div><h1>Pick parts. Build your E36. Share it.</h1><p>Choose a chassis, add parts for every system, and see cost, power and weight add up. Compatibility checks catch missing supporting mods before you spend the money.</p><p><a class="btn pick big" href="#builder">Start your build</a></p></div><div class="card snap"><span class="sub">Your current build</span><div id="snapname" style="font-weight:600"></div><div class="g" id="snapnums"></div><a href="#builder">Open in builder</a></div></section>
+<section class="three"><div class="card"><h2>Pick parts</h2><p class="sub">Engines, turbos, suspension, brakes and more, each with price, power and weight.</p></div><div class="card"><h2>Check compatibility</h2><p class="sub">Get warned about fuel, cooling, clutch, diff and brake gaps for your power level.</p></div><div class="card"><h2>Share and discuss</h2><p class="sub">Every part links to shops, real builds and a shared comment thread.</p></div></section>
+<section class="sec" id="featured"><h2>Completed builds</h2><div class="cards" id="pre"></div></section>
+<section class="sec" id="cats"><h2>Browse parts</h2><div class="cards" id="tiles"></div></section>
+<section class="sec" id="guides"><h2>Guides and build threads</h2><div class="cards" id="gd"></div></section>
+</div></div>
+<div id="builder" hidden>
+<header>
+<h1>E36 Part Picker</h1>
+<p>Plan a BMW E36 build part by part. Totals update live, compatibility checks flag missing supporting mods, and every part links to shops, real builds and a shared discussion thread.</p>
+</header>
+<main>
+<section class="card base">
+<label for="car"><b>Base car</b></label><select id="car"></select><span class="sub" id="carinfo"></span>
+<span style="flex:1"></span>
+<div class="row"><button id="gen" class="pick">Build discussion</button><button id="save">Save</button><button id="load">Load</button><button id="clear" class="rm">Clear</button></div>
+</section>
+<section class="card table"><table><thead><tr><th>Category</th><th>Part</th><th class="num">Power</th><th class="num">Weight</th><th class="num">Price</th><th></th></tr></thead><tbody id="rows"></tbody></table></section>
+<section class="card totals" id="totals"></section>
+<section class="card notes"><h2>Compatibility and notes</h2><ul id="notes"></ul></section>
+<p class="sub">Prices and power gains are rough US estimates for planning. Shop and build links open searches on other sites, so check fitment (year, engine, transmission) before buying. Check local emissions and noise laws.</p>
+</main></div>
+<footer>E36 Part Picker is an independent fan project. Prices are estimates and not affiliated with any shop or brand.</footer>
+<dialog id="dlg"><div class="dh"><h2 id="dt"></h2><input id="q" type="search" placeholder="Search" aria-label="Search parts"><select id="sort" aria-label="Sort"><option value="n">Name</option><option value="p">Price</option><option value="h">Power</option></select><button id="close">Close</button></div><div id="list"></div></dialog>
+<dialog id="cdlg"><div class="dh"><h2 id="ct"></h2><button id="cclose">Close</button></div><div id="clist"></div><div class="form"><input id="cn" placeholder="Your name or handle" maxlength="40" aria-label="Your name"><textarea id="cx" rows="3" maxlength="1500" placeholder="Share your experience, fitment tips, or paste a link to your build thread or video" aria-label="Comment"></textarea><div class="row"><button id="cpost" class="pick">Post comment</button><span class="sub" id="cmsg"></span></div></div></dialog>
+<div id="toast" role="status"></div>
+<script>
+var CARS=[["328","1996 BMW 328i (M52B28)",5500,190,3000],["325","1992 BMW 325i (M50B25)",4000,189,2900],["m3","1995 BMW M3 (US S50B30)",14000,240,3160]];
+var CATS=[["engine","Engine / swap"],["boost","Forced induction"],["intake","Intake"],["exhaust","Headers / exhaust"],["fuel","Fuel system"],["cool","Cooling"],["ecu","ECU / tune"],["clutch","Clutch / flywheel"],["trans","Transmission"],["diff","Differential"],["susp","Coilovers / shocks"],["chassis","Sway bars / bushings"],["wheels","Wheels"],["tires","Tires"],["brakes","Brakes"],["body","Seats / cage / aero"]];
+// cat, name, price, hp (engine = total hp), weight change lb, flag, fits (optional base ids)
+var P=[
+["engine","M52B28 rebuild + VANOS refresh",2500,190,0,"","328"],
+["engine","S52 3.2L (US M3) swap",4500,240,20,"swap","328,325"],
+["engine","S50B30 3.0L (Euro M3, 286 hp) swap",7000,286,20,"swap","328,325,m3"],
+["engine","S54 3.2L (E46 M3) swap",12500,333,50,"swap","328,325,m3"],
+["engine","LS3 V8 swap (crate, 430 hp)",14000,430,80,"swap","328,325,m3"],
+["engine","2JZ-GTE swap (stock turbos)",12500,320,90,"swap","328,325,m3"],
+["boost","Turbo kit, small (about 8 psi)",3200,70,35,"boost"],
+["boost","Turbo kit, Garrett G25-660 (about 14 psi)",5500,150,40,"boost"],
+["boost","Turbo kit, Precision 6266 (about 20 psi)",7500,260,45,"boost"],
+["boost","Centrifugal supercharger kit",5800,90,45,"boost"],
+["intake","Cold air intake",250,6,0,""],
+["intake","Intake manifold (ported) + throttle body",900,12,0,""],
+["intake","Individual throttle bodies (ITBs)",3500,25,0,""],
+["exhaust","Cat-back exhaust (Supersprint style)",1100,10,-15,""],
+["exhaust","Long-tube headers + cat-back",2000,25,-20,""],
+["exhaust","Straight-pipe exhaust",1200,28,-35,"loud"],
+["fuel","Walbro 255 fuel pump",120,0,0,"fuel"],
+["fuel","Larger injectors + adjustable regulator",600,0,0,"fuel"],
+["fuel","Injector Dynamics ID1050x + rail + pump",1800,0,0,"fuel"],
+["cool","Full cooling overhaul kit (plastics, pump, hoses)",500,0,0,"cool"],
+["cool","CSF aluminum radiator + overhaul",1100,0,-5,"cool"],
+["cool","Radiator, oil cooler and fan kit",1800,0,10,"cool"],
+["ecu","Dyno tune (stock ECU, chip/reflash)",700,12,0,"tune"],
+["ecu","Standalone ECU (MS3Pro / Haltech) + tune",2800,25,0,"tune"],
+["clutch","Stage 1 clutch (organic)",450,0,0,"clutch"],
+["clutch","Stage 3 clutch + lightweight flywheel",1200,0,-15,"clutch"],
+["clutch","Twin-disc clutch kit",2200,0,-10,"clutch"],
+["trans","ZF 5-speed (stock, rebuilt)",900,0,0,"trans0"],
+["trans","Getrag 420G 6-speed swap",3500,0,40,"trans"],
+["trans","ZF 6-speed (E46 M3) swap",4500,0,30,"trans"],
+["trans","Tremec T56 swap + adapter",5500,0,90,"trans"],
+["diff","3.15 limited-slip (clutch-type LSD)",900,0,10,"lsd"],
+["diff","Torsen / Quaife helical LSD",1100,0,10,"lsd"],
+["diff","Kaaz-style 2-way LSD + new axles",1800,0,15,"lsd"],
+["susp","Bilstein B6 shocks + Eibach springs",800,0,0,"susp"],
+["susp","KW V1 coilovers",1500,0,0,"susp"],
+["susp","Ground Control coilovers + camber plates",1800,0,5,"susp"],
+["chassis","Powerflex bushing kit",350,0,0,""],
+["chassis","Hotchkis sway bars + subframe reinforcement",900,0,5,""],
+["chassis","Adjustable control arms + camber plates",1300,0,5,""],
+["wheels","17x8.5 Apex SM-10 flow-formed",1100,0,-15,""],
+["wheels","17x9 Enkei RPF1",1400,0,-18,""],
+["wheels","18x9.5 forged (staggered / square)",3800,0,-12,""],
+["tires","Michelin Pilot Sport 4S",900,0,0,"grip"],
+["tires","Falken Azenis RT615K+ (200tw)",750,0,0,"grip"],
+["tires","Toyo Proxes R888R (R-compound)",1100,0,0,"grip"],
+["tires","Budget all-season / drift tires",350,0,0,""],
+["brakes","Zimmermann rotors + Hawk HPS pads",600,0,0,"brake"],
+["brakes","Stainless lines + ATE Typ 200 + track pads",650,0,0,"brake"],
+["brakes","Big brake kit (Brembo / StopTech)",3200,0,15,"brake"],
+["body","Bucket seats (Recaro / Corbeau)",1100,0,-25,""],
+["body","Strip interior + bolt-in 6-point cage",2200,0,-30,""],
+["body","Front splitter + trunk wing",900,0,10,""]
+].map(function(a,i){return{cat:a[0],name:a[1],price:a[2],hp:a[3],lb:a[4],tag:a[5],fits:a[6],id:i}});
+var S={car:"328",picks:{}},cur=null,ck=null,unsub=null,dbp=null;
+var $=function(i){return document.getElementById(i)},usd=function(n){return "$"+n.toLocaleString("en-US")};
+var sgn=function(n,u){return (n>0?"+":"")+n+" "+u},slug=function(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,60)};
+var car=function(){return CARS.filter(function(c){return c[0]===S.car})[0]};
+var fits=function(p){return !p.fits||p.fits.split(",").indexOf(S.car)>-1};
+var sel=function(c){var i=S.picks[c];return i==null?null:P[i]};
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display="none"},2000)}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+var links=function(p){var q=encodeURIComponent(p.name+" E36");return{
+ shop:"https://www.ecstuning.com/Search/SiteSearch/"+q,
+ buy:"https://www.google.com/search?tbm=shop&q="+q,
+ yt:"https://www.youtube.com/results?search_query="+encodeURIComponent("E36 build "+p.name),
+ rd:"https://www.reddit.com/r/E36/search/?restrict_sr=1&q="+encodeURIComponent(p.name)}};
+function render(){
+ var c=car(),hp=c[3],lb=c[4],cost=c[2],has={},eng=sel("engine"),h="";
+ if(eng)hp=eng.hp;
+ $("carinfo").textContent=c[3]+" hp, "+c[4]+" lb";
+ CATS.forEach(function(k){var p=sel(k[0]);
+  if(p){if(k[0]!=="engine")hp+=p.hp;lb+=p.lb;cost+=p.price;if(p.tag)has[p.tag]=1}
+  h+="<tr><td class='cat'>"+k[1]+"</td><td>"+(p?p.name:"<span class='sub'>Nothing chosen</span>")+"</td><td class='num'>"+(p?(k[0]==="engine"?p.hp+" hp":sgn(p.hp,"hp")):"")+"</td><td class='num'>"+(p?sgn(p.lb,"lb"):"")+"</td><td class='num'>"+(p?usd(p.price):"")+"</td><td class='num'>"+(p?"<button class='rm' data-rm='"+k[0]+"'>Remove</button>":"<button class='pick' data-pick='"+k[0]+"'>Choose</button>")+"</td></tr>"});
+ $("rows").innerHTML=h;
+ $("totals").innerHTML=[["Total cost",usd(cost)],["Estimated power",hp+" hp"],["Curb weight",lb.toLocaleString("en-US")+" lb"],["Weight per hp",(lb/hp).toFixed(1)+" lb/hp"]].map(function(x){return "<div><b>"+x[1]+"</b><span>"+x[0]+"</span></div>"}).join("");
+ var n=[];
+ if(has.boost&&!has.tune)n.push(["e","Forced induction needs a custom tune or standalone ECU. Without one, expect a lean mixture and a dead motor."]);
+ if(has.boost&&!has.fuel)n.push(["w","Boost needs more fuel: add at least a stronger pump and injectors."]);
+ if(has.boost&&eng&&eng.tag==="swap"&&/S52|S50|S54/.test(eng.name)&&hp>350)n.push(["w","High boost on a stock-internal M-series motor is risky. Consider forged rods and pistons."]);
+ if(hp>=250&&!has.cool)n.push(["w","At "+hp+" hp, upgrade the cooling system. A hot E36 cooks head gaskets."]);
+ else if(!has.cool)n.push(["w","Even stock, budget a cooling overhaul: E36 plastic radiator necks, expansion tanks and water pumps fail with age."]);
+ if(hp>=260&&!has.clutch)n.push(["w","The stock clutch will slip at "+hp+" hp. Upgrade the clutch."]);
+ if(hp>=300&&!has.trans&&(!eng||eng.tag!=="swap"||/LS3|2JZ/.test(eng.name)))n.push(["w","At "+hp+" hp the stock gearbox is at risk. Consider a Getrag 420G, ZF 6-speed or T56."]);
+ if(hp>=240&&!has.lsd)n.push(["w","A limited-slip differential is strongly advised at "+hp+" hp. The stock open diff will spin one wheel."]);
+ if(hp>=250&&!has.brake)n.push(["w","Upgrade the brakes to match "+hp+" hp."]);
+ if(hp>=300&&!has.grip)n.push(["w","At "+hp+" hp you need high-grip tires to use the power."]);
+ if(hp>=220&&!has.susp)n.push(["w","Stock suspension will struggle with this power. Add coilovers or quality shocks and springs."]);
+ if(has.loud)n.push(["w","Straight-pipe exhausts are often illegal on public roads."]);
+ if(eng&&eng.tag==="swap")n.push(["w","Swaps need mounts, wiring, ECU, driveshaft and cooling work that isn’t priced here. Read swap threads first (use each part’s Builds links)."]);
+ if(!n.length)n.push(["ok","No problems found with this combination."]);
+ $("notes").innerHTML=n.map(function(x){return "<li class='"+x[0]+"'>"+x[1]+"</li>"}).join("");
+ store("e36",JSON.stringify(S));
+}
+function openPick(cat){cur=cat;$("dt").textContent=CATS.filter(function(k){return k[0]===cat})[0][1];$("q").value="";list();$("dlg").showModal()}
+function list(){
+ var q=$("q").value.toLowerCase(),s=$("sort").value;
+ var a=P.filter(function(p){return p.cat===cur&&p.name.toLowerCase().indexOf(q)>-1}).sort(function(x,y){return s==="p"?x.price-y.price:s==="h"?y.hp-x.hp:x.id-y.id});
+ $("list").innerHTML=a.length?a.map(function(p){var ok=fits(p),l=links(p);
+  return "<div class='item"+(ok?"":" dis")+"'><div class='info'><b>"+p.name+"</b><div class='sub'>"+(ok?(p.cat==="engine"?p.hp+" hp total, ":sgn(p.hp,"hp")+", ")+sgn(p.lb,"lb")+" · "+usd(p.price):"Doesn’t fit this base car")+"</div><div class='row' style='margin-top:6px'><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.shop+"'>Shop at ECS</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.buy+"'>Compare prices</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.yt+"'>Builds (video)</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.rd+"'>Builds (r/E36)</a><button data-cm='"+p.id+"'>Discuss</button></div></div><button class='pick' data-add='"+p.id+"'"+(ok?"":" disabled")+">Add</button></div>"}).join(""):"<p class='sub' style='padding:16px'>No parts match your search.</p>";
+}
+function linkify(txt,el){txt.split(/(https?:\/\/[^\s<]+)/g).forEach(function(s,i){if(i%2){var a=document.createElement("a");a.href=s;a.textContent=s;a.target="_blank";a.rel="noopener noreferrer nofollow";el.appendChild(a)}else el.appendChild(document.createTextNode(s))})}
+function openCm(key,title){
+ $("ct").textContent=title;$("clist").innerHTML="<p class='cm sub'>Loading…</p>";$("cn").value=store("e36n")||"";$("cmsg").textContent="";
+ ck=key;if(unsub){unsub();unsub=null}
+ if(!$("cdlg").open)$("cdlg").showModal();
+ if(!dbp)dbp=window.claude?claude.use("db"):Promise.resolve(null);
+ dbp.then(function(db){
+  if(!db){$("clist").innerHTML="<p class='cm sub'>Shared comments aren’t available in this view. Open the page from its claude.ai link while signed in.</p>";return}
+  unsub=db.collection("comments").where("k","==",key).limit(300).onSnapshot(function(s){
+   var d=s.docs.map(function(x){return x.data()}).sort(function(a,b){return b.ts-a.ts}),box=$("clist");box.innerHTML="";
+   if(!d.length){box.innerHTML="<p class='cm sub'>No comments yet. Be the first to share a build or fitment tip.</p>";return}
+   d.forEach(function(m){var r=document.createElement("div");r.className="cm";var b=document.createElement("b");b.textContent=m.n||"Anonymous";var t=document.createElement("span");t.className="sub";t.textContent=" · "+new Date(m.ts).toLocaleDateString();var p=document.createElement("p");linkify(String(m.t||""),p);r.append(b,t,p);box.appendChild(r)})
+  },function(){$("clist").innerHTML="<p class='cm sub'>Couldn’t load comments.</p>"});
+ });
+}
+$("cpost").addEventListener("click",function(){
+ var t=$("cx").value.trim(),n=$("cn").value.trim();if(!t){$("cmsg").textContent="Write a comment first.";return}
+ store("e36n",n);
+ dbp.then(function(db){if(!db)throw 0;return db.collection("comments").add({k:ck,t:t,n:n,ts:Date.now()})}).then(function(){$("cx").value="";$("cmsg").textContent="Posted."}).catch(function(){$("cmsg").textContent="Couldn’t post. You may need edit or contributor access to this page."});
+});
+$("gen").addEventListener("click",function(){openCm("general","E36 build discussion")});
+$("cclose").addEventListener("click",function(){$("cdlg").close();if(unsub){unsub();unsub=null}});
+$("cdlg").addEventListener("close",function(){if(unsub){unsub();unsub=null}});
+$("rows").addEventListener("click",function(e){var t=e.target;if(t.dataset.pick)openPick(t.dataset.pick);if(t.dataset.rm){delete S.picks[t.dataset.rm];render()}});
+$("list").addEventListener("click",function(e){var t=e.target;
+ if(t.dataset.add!=null){S.picks[cur]=+t.dataset.add;$("dlg").close();render()}
+ if(t.dataset.cm!=null){var p=P[+t.dataset.cm];openCm(slug(p.name),"Discuss: "+p.name)}});
+$("q").addEventListener("input",list);$("sort").addEventListener("change",list);
+$("close").addEventListener("click",function(){$("dlg").close()});
+$("car").addEventListener("change",function(){S.car=this.value;Object.keys(S.picks).forEach(function(k){if(!fits(P[S.picks[k]]))delete S.picks[k]});render()});
+$("clear").addEventListener("click",function(){S.picks={};render();toast("Parts cleared")});
+$("save").addEventListener("click",function(){store("e36s",JSON.stringify(S));toast("Build saved")});
+$("load").addEventListener("click",function(){try{var s=JSON.parse(store("e36s"));if(!s)throw 0;S=s;$("car").value=S.car;render();toast("Build loaded")}catch(e){toast("No saved build found")}});
+$("car").innerHTML=CARS.map(function(c){return "<option value='"+c[0]+"'>"+c[1]+" – "+usd(c[2])+"</option>"}).join("");
+try{var r=JSON.parse(store("e36"));if(r&&r.car&&r.picks)S=r}catch(e){}
+$("car").value=S.car;render();
+var PRE=[
+["Budget drift 328i","Seat time first: cooling, diff, coilovers, tires.",["Cat-back exhaust (Supersprint style)","Full cooling overhaul kit (plastics, pump, hoses)","Stage 1 clutch (organic)","3.15 limited-slip (clutch-type LSD)","KW V1 coilovers","17x8.5 Apex SM-10 flow-formed","Budget all-season / drift tires","Bucket seats (Recaro / Corbeau)"]],
+["Track day turbo M52","Small turbo on a reliable M52 with a solid supporting list.",["Turbo kit, small (about 8 psi)","Standalone ECU (MS3Pro / Haltech) + tune","Larger injectors + adjustable regulator","CSF aluminum radiator + overhaul","Stage 3 clutch + lightweight flywheel","Torsen / Quaife helical LSD","Ground Control coilovers + camber plates","17x9 Enkei RPF1","Falken Azenis RT615K+ (200tw)","Stainless lines + ATE Typ 200 + track pads","Bucket seats (Recaro / Corbeau)"]],
+["S54 sleeper","E46 M3 engine and six-speed in a clean-looking 328i.",["S54 3.2L (E46 M3) swap","ZF 6-speed (E46 M3) swap","Radiator, oil cooler and fan kit","Torsen / Quaife helical LSD","KW V1 coilovers","17x9 Enkei RPF1","Michelin Pilot Sport 4S","Zimmermann rotors + Hawk HPS pads"]],
+["LS3 monster","430 hp V8, T56 and the parts to back it up.",["LS3 V8 swap (crate, 430 hp)","Tremec T56 swap + adapter","Radiator, oil cooler and fan kit","Kaaz-style 2-way LSD + new axles","Ground Control coilovers + camber plates","18x9.5 forged (staggered / square)","Toyo Proxes R888R (R-compound)","Big brake kit (Brembo / StopTech)","Strip interior + bolt-in 6-point cage"]]];
+var GD=[["E36 cooling overhaul","E36 cooling system overhaul"],["M52 turbo builds","E36 M52 turbo build"],["S54 swap threads","E36 S54 swap"],["LS swap threads","E36 LS swap"],["Best first mods","E36 best first mods"],["Track prep","E36 track day prep"]];
+function byName(n){return P.filter(function(p){return p.name===n})[0]}
+function tot(cid,ps){var c=CARS.filter(function(x){return x[0]===cid})[0],hp=c[3],lb=c[4],cost=c[2],e=ps.filter(function(p){return p.cat==="engine"})[0];
+ if(e)hp=e.hp;ps.forEach(function(p){cost+=p.price;lb+=p.lb;if(p.cat!=="engine")hp+=p.hp});return{cost:cost,hp:hp,lb:lb}}
+function nums(t){return [[usd(t.cost),"cost"],[t.hp+" hp","power"],[(t.lb/t.hp).toFixed(1),"lb/hp"]].map(function(x){return "<div><b style='font-size:26px'>"+x[0]+"</b><div class='sub'>"+x[1]+"</div></div>"}).join("")}
+function snap(){var ps=Object.keys(S.picks).map(function(k){return P[S.picks[k]]});$("snapname").textContent=car()[1]+", "+ps.length+" parts";$("snapnums").innerHTML=nums(tot(S.car,ps))}
+var _r=render;render=function(){_r();snap()};snap();
+$("pre").innerHTML=PRE.map(function(b,i){return "<div class='card'><h3>"+b[0]+"</h3><p class='sub'>"+b[1]+"</p><div class='g' style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0'>"+nums(tot("328",b[2].map(byName)))+"</div><button class='pick' data-pre='"+i+"'>Load in builder</button></div>"}).join("");
+$("tiles").innerHTML=CATS.map(function(k){var n=P.filter(function(p){return p.cat===k[0]}).length;return "<button class='tile' data-cat='"+k[0]+"'><b>"+k[1]+"</b><span class='sub'>"+n+" parts</span></button>"}).join("");
+$("gd").innerHTML=GD.map(function(g){return "<div class='card'><h3>"+g[0]+"</h3><div class='row'><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.youtube.com/results?search_query="+encodeURIComponent(g[1])+"'>Videos</a><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.reddit.com/r/E36/search/?restrict_sr=1&q="+encodeURIComponent(g[1])+"'>r/E36</a></div></div>"}).join("");
+function route(){var b=location.hash==="#builder";$("home").hidden=b;$("builder").hidden=!b;window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);route();
+document.addEventListener("click",function(e){var t=e.target;
+ if(t.dataset.go){var el=$(t.dataset.go);if(location.hash==="#builder")location.hash="home";setTimeout(function(){el.scrollIntoView({behavior:"smooth"})},50)}
+ if(t.dataset.cat)openPick(t.dataset.cat);
+ if(t.dataset.pre!=null){S={car:"328",picks:{}};PRE[+t.dataset.pre][2].forEach(function(n){var p=byName(n);S.picks[p.cat]=p.id});$("car").value="328";render();location.hash="builder"}});
+$("navcm").addEventListener("click",function(){openCm("general","E36 build discussion")});
+</script>
+</body>
+</html>
