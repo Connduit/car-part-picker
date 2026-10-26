@@ -58,6 +58,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .cards h3{font:700 22px "Barlow Condensed",sans-serif;margin:0 0 4px}
 .tile{text-align:left;padding:14px;width:100%}.tile b{display:block;font:600 19px "Barlow Condensed",sans-serif}
 footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);font-size:13px;text-align:center}
+.iss{margin-top:6px;font-size:13px}.iss summary{cursor:pointer;color:var(--warn);font-weight:600}.iss ul{margin:4px 0 0 18px;padding:0}
 </style>
 </head>
 <body>
@@ -83,6 +84,7 @@ footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);fon
 <section class="card table"><table><thead><tr><th>Category</th><th>Part</th><th class="num">Power</th><th class="num">Weight</th><th class="num">Price</th><th></th></tr></thead><tbody id="rows"></tbody></table></section>
 <section class="card totals" id="totals"></section>
 <section class="card notes"><h2>Compatibility and notes</h2><ul id="notes"></ul></section>
+<section class="card notes"><h2>Known E36 problems to check on any build</h2><ul><li><b>Rear subframe mounts:</b> the mounting points can crack or tear from the chassis, especially with more power, sticky tires or track use. Inspect and reinforce them.</li><li><b>Cooling system:</b> plastic radiator necks, expansion tank, thermostat housing and water pump fail with age.</li><li><b>Oil leaks:</b> valve cover, oil filter housing and oil pan gaskets are common leak points.</li><li><b>VANOS seals:</b> worn seals cause a rattle and power loss on M52 and S52 engines.</li><li><b>Bushings and mounts:</b> rear trailing arm bushings, front control arm bushings and front strut guide supports wear out and hurt handling.</li><li><b>Rust:</b> check the rear arches, sills and jacking points on any car before you start.</li></ul><p class="sub">Based on commonly reported owner experiences. Confirm with a trusted E36 mechanic before spending money.</p></section>
 <p class="sub">Prices and power gains are rough US estimates for planning. Shop and build links open searches on other sites, so check fitment (year, engine, transmission) before buying. Check local emissions and noise laws.</p>
 </main></div>
 <footer>Car Part Picker is an independent fan project. Prices are estimates and not affiliated with any shop or brand.</footer>
@@ -91,7 +93,7 @@ footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);fon
 <div id="toast" role="status"></div>
 <script>
 var CARS=[["328","1996 BMW 328i (M52B28)",5500,190,3000],["325","1992 BMW 325i (M50B25)",4000,189,2900],["m3","1995 BMW M3 (US S50B30)",14000,240,3160]];
-var CATS=[["engine","Engine / swap"],["boost","Forced induction"],["intake","Intake"],["exhaust","Headers / exhaust"],["fuel","Fuel system"],["cool","Cooling"],["ecu","ECU / tune"],["clutch","Clutch / flywheel"],["trans","Transmission"],["diff","Differential"],["susp","Coilovers / shocks"],["chassis","Sway bars / bushings"],["wheels","Wheels"],["tires","Tires"],["brakes","Brakes"],["body","Seats / cage / aero"]];
+var CATS=[["engine","Engine / swap"],["boost","Forced induction"],["intake","Intake"],["exhaust","Headers / exhaust"],["fuel","Fuel system"],["cool","Cooling"],["ecu","ECU / tune"],["clutch","Clutch / flywheel"],["trans","Transmission"],["diff","Differential"],["susp","Coilovers / shocks"],["chassis","Chassis / subframe / bushings"],["wheels","Wheels"],["tires","Tires"],["brakes","Brakes"],["body","Seats / cage / aero"]];
 // cat, name, price, hp (engine = total hp), weight change lb, flag, fits (optional base ids)
 var P=[
 ["engine","M52B28 rebuild + VANOS refresh",2500,190,0,"","328"],
@@ -132,7 +134,7 @@ var P=[
 ["susp","KW V1 coilovers",1500,0,0,"susp"],
 ["susp","Ground Control coilovers + camber plates",1800,0,5,"susp"],
 ["chassis","Powerflex bushing kit",350,0,0,""],
-["chassis","Hotchkis sway bars + subframe reinforcement",900,0,5,""],
+["chassis","Hotchkis sway bars (front and rear)",900,0,5,""],
 ["chassis","Adjustable control arms + camber plates",1300,0,5,""],
 ["wheels","17x8.5 Apex SM-10 flow-formed",1100,0,-15,""],
 ["wheels","17x9 Enkei RPF1",1400,0,-18,""],
@@ -146,7 +148,9 @@ var P=[
 ["brakes","Big brake kit (Brembo / StopTech)",3200,0,15,"brake"],
 ["body","Bucket seats (Recaro / Corbeau)",1100,0,-25,""],
 ["body","Strip interior + bolt-in 6-point cage",2200,0,-30,""],
-["body","Front splitter + trunk wing",900,0,10,""]
+["body","Front splitter + trunk wing",900,0,10,""],
+["chassis","Rear subframe reinforcement plates (weld-in)",450,0,8,"sub"],
+["chassis","Subframe reinforcement + shock tower braces + seam welding",1800,0,25,"sub"]
 ].map(function(a,i){return{cat:a[0],name:a[1],price:a[2],hp:a[3],lb:a[4],tag:a[5],fits:a[6],id:i}});
 var S={car:"328",picks:{}},cur=null,ck=null,unsub=null,dbp=null;
 var $=function(i){return document.getElementById(i)},usd=function(n){return "$"+n.toLocaleString("en-US")};
@@ -167,7 +171,7 @@ function render(){
  $("carinfo").textContent=c[3]+" hp, "+c[4]+" lb";
  CATS.forEach(function(k){var p=sel(k[0]);
   if(p){if(k[0]!=="engine")hp+=p.hp;lb+=p.lb;cost+=p.price;if(p.tag)has[p.tag]=1}
-  h+="<tr><td class='cat'>"+k[1]+"</td><td>"+(p?p.name:"<span class='sub'>Nothing chosen</span>")+"</td><td class='num'>"+(p?(k[0]==="engine"?p.hp+" hp":sgn(p.hp,"hp")):"")+"</td><td class='num'>"+(p?sgn(p.lb,"lb"):"")+"</td><td class='num'>"+(p?usd(p.price):"")+"</td><td class='num'>"+(p?"<button class='rm' data-rm='"+k[0]+"'>Remove</button>":"<button class='pick' data-pick='"+k[0]+"'>Choose</button>")+"</td></tr>"});
+  h+="<tr><td class='cat'>"+k[1]+"</td><td>"+(p?p.name+(ISS[p.name]?"<div class='sub'>Known issue: "+ISS[p.name][0]+"</div>":""):"<span class='sub'>Nothing chosen</span>")+"</td><td class='num'>"+(p?(k[0]==="engine"?p.hp+" hp":sgn(p.hp,"hp")):"")+"</td><td class='num'>"+(p?sgn(p.lb,"lb"):"")+"</td><td class='num'>"+(p?usd(p.price):"")+"</td><td class='num'>"+(p?"<button class='rm' data-rm='"+k[0]+"'>Remove</button>":"<button class='pick' data-pick='"+k[0]+"'>Choose</button>")+"</td></tr>"});
  $("rows").innerHTML=h;
  $("totals").innerHTML=[["Total cost",usd(cost)],["Estimated power",hp+" hp"],["Curb weight",lb.toLocaleString("en-US")+" lb"],["Weight per hp",(lb/hp).toFixed(1)+" lb/hp"]].map(function(x){return "<div><b>"+x[1]+"</b><span>"+x[0]+"</span></div>"}).join("");
  var n=[];
@@ -179,6 +183,7 @@ function render(){
  if(hp>=260&&!has.clutch)n.push(["w","The stock clutch will slip at "+hp+" hp. Upgrade the clutch."]);
  if(hp>=300&&!has.trans&&(!eng||eng.tag!=="swap"||/LS3|2JZ/.test(eng.name)))n.push(["w","At "+hp+" hp the stock gearbox is at risk. Consider a Getrag 420G, ZF 6-speed or T56."]);
  if(hp>=240&&!has.lsd)n.push(["w","A limited-slip differential is strongly advised at "+hp+" hp. The stock open diff will spin one wheel."]);
+ if(hp>=250&&!has.sub)n.push([hp>=350?"e":"w","The E36 rear subframe mounting points are known to crack or tear from the chassis with more power and grippy tires. Reinforce them, and inspect for existing cracks, before pushing "+hp+" hp."]);
  if(hp>=250&&!has.brake)n.push(["w","Upgrade the brakes to match "+hp+" hp."]);
  if(hp>=300&&!has.grip)n.push(["w","At "+hp+" hp you need high-grip tires to use the power."]);
  if(hp>=220&&!has.susp)n.push(["w","Stock suspension will struggle with this power. Add coilovers or quality shocks and springs."]);
@@ -188,12 +193,44 @@ function render(){
  $("notes").innerHTML=n.map(function(x){return "<li class='"+x[0]+"'>"+x[1]+"</li>"}).join("");
  store("e36",JSON.stringify(S));
 }
+var BT=["Stock M52 internals are a common limit; many builders upgrade rods and pistons at higher boost","Needs oil feed and return, intercooler, wastegate and a proper tune"];
+var ISS={"M52B28 rebuild + VANOS refresh":["VANOS seals commonly fail; a rattle at idle is a typical sign","Replace the valve cover and oil filter housing gaskets while it’s apart"],
+"S52 3.2L (US M3) swap":["Donor mileage and VANOS condition vary; budget seals and a full gasket refresh","Wiring and ECU conversion is the hardest part of the swap"],
+"S50B30 3.0L (Euro M3, 286 hp) swap":["Euro engine: emissions equipment and ECU setup can make road registration difficult","Budget seals and gaskets for any used motor"],
+"S54 3.2L (E46 M3) swap":["Rod bearing wear is a well-known S54 weak point; many owners replace them proactively","Throttle actuators and VANOS solenoids are also commonly reported problems","Needs custom mounts, wiring and a lot of fabrication on an E36"],
+"LS3 V8 swap (crate, 430 hp)":["Oil pan and front crossmember clearance require a swap kit","Adds weight over the front axle; plan on stiffer springs","Steering rack and power steering routing need attention"],
+"2JZ-GTE swap (stock turbos)":["Heavy cast-iron block makes the car nose-heavy","Needs a transmission adapter, custom wiring and a stronger driveline"],
+"Turbo kit, small (about 8 psi)":BT,"Turbo kit, Garrett G25-660 (about 14 psi)":BT,"Turbo kit, Precision 6266 (about 20 psi)":BT,"Centrifugal supercharger kit":BT,
+"Individual throttle bodies (ITBs)":["Needs a standalone ECU and tune; vacuum for the brake booster and accessories needs a plan"],
+"Straight-pipe exhaust":["Very loud and often illegal on public roads"],
+"Full cooling overhaul kit (plastics, pump, hoses)":["Replace the expansion tank, thermostat, water pump and hoses together; the plastic parts age out"],
+"Standalone ECU (MS3Pro / Haltech) + tune":["Tune quality matters more than the ECU brand; use an experienced tuner"],
+"Stage 3 clutch + lightweight flywheel":["Lighter flywheel adds noise and harsher engagement on the street"],
+"Twin-disc clutch kit":["Harsh street manners and shorter life"],
+"3.15 limited-slip (clutch-type LSD)":["Clutch plates wear and may need rebuilding"],
+"Kaaz-style 2-way LSD + new axles":["Aggressive lockup is noisy and can be unpredictable on the street"],
+"Tremec T56 swap + adapter":["Needs an adapter, custom driveshaft and crossmember; tunnel clearance can be tight"],
+"Getrag 420G 6-speed swap":["Needs a matching driveshaft and shifter; used units vary in condition"],
+"ZF 6-speed (E46 M3) swap":["Needs a matching driveshaft and shifter; used units vary in condition"],
+"KW V1 coilovers":["Lowering a lot increases chassis stress and needs a geometry check"],
+"Ground Control coilovers + camber plates":["Lowering a lot increases chassis stress and needs a geometry check"],
+"Hotchkis sway bars (front and rear)":["Stiffer sway bars load the chassis mounting points more"],
+"Powerflex bushing kit":["Polyurethane bushings can transmit more noise and vibration"],
+"Rear subframe reinforcement plates (weld-in)":["Needs professional welding; inspect the mount area for existing cracks first"],
+"Subframe reinforcement + shock tower braces + seam welding":["Needs professional welding and paint prep; inspect for existing cracks first"],
+"17x9 Enkei RPF1":["Tires wider than about 245 usually need fender rolling or pulling"],
+"18x9.5 forged (staggered / square)":["Usually needs fender rolling or pulling; check brake clearance"],
+"Falken Azenis RT615K+ (200tw)":["Wear quickly and are loud on the street"],
+"Toyo Proxes R888R (R-compound)":["Short heat-cycle life and poor in cold and wet conditions"],
+"Big brake kit (Brembo / StopTech)":["Check wheel clearance; some kits need 17 inch or larger wheels"],
+"Strip interior + bolt-in 6-point cage":["Bolt-in cages need proper mounting plates; noise and rattles increase"]};
+function iss(p){var a=ISS[p.name];return a?"<details class='iss'><summary>Known issues</summary><ul>"+a.map(function(x){return "<li>"+x+"</li>"}).join("")+"</ul></details>":""}
 function openPick(cat){cur=cat;$("dt").textContent=CATS.filter(function(k){return k[0]===cat})[0][1];$("q").value="";list();$("dlg").showModal()}
 function list(){
  var q=$("q").value.toLowerCase(),s=$("sort").value;
  var a=P.filter(function(p){return p.cat===cur&&p.name.toLowerCase().indexOf(q)>-1}).sort(function(x,y){return s==="p"?x.price-y.price:s==="h"?y.hp-x.hp:x.id-y.id});
  $("list").innerHTML=a.length?a.map(function(p){var ok=fits(p),l=links(p);
-  return "<div class='item"+(ok?"":" dis")+"'><div class='info'><b>"+p.name+"</b><div class='sub'>"+(ok?(p.cat==="engine"?p.hp+" hp total, ":sgn(p.hp,"hp")+", ")+sgn(p.lb,"lb")+" · "+usd(p.price):"Doesn’t fit this base car")+"</div><div class='row' style='margin-top:6px'><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.shop+"'>Shop at ECS</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.buy+"'>Compare prices</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.yt+"'>Builds (video)</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.rd+"'>Builds (r/E36)</a><button data-cm='"+p.id+"'>Discuss</button></div></div><button class='pick' data-add='"+p.id+"'"+(ok?"":" disabled")+">Add</button></div>"}).join(""):"<p class='sub' style='padding:16px'>No parts match your search.</p>";
+  return "<div class='item"+(ok?"":" dis")+"'><div class='info'><b>"+p.name+"</b><div class='sub'>"+(ok?(p.cat==="engine"?p.hp+" hp total, ":sgn(p.hp,"hp")+", ")+sgn(p.lb,"lb")+" · "+usd(p.price):"Doesn’t fit this base car")+"</div>"+iss(p)+"<div class='row' style='margin-top:6px'><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.shop+"'>Shop at ECS</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.buy+"'>Compare prices</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.yt+"'>Builds (video)</a><a class='btn' target='_blank' rel='noopener noreferrer' href='"+l.rd+"'>Builds (r/E36)</a><button data-cm='"+p.id+"'>Discuss</button></div></div><button class='pick' data-add='"+p.id+"'"+(ok?"":" disabled")+">Add</button></div>"}).join(""):"<p class='sub' style='padding:16px'>No parts match your search.</p>";
 }
 function linkify(txt,el){txt.split(/(https?:\/\/[^\s<]+)/g).forEach(function(s,i){if(i%2){var a=document.createElement("a");a.href=s;a.textContent=s;a.target="_blank";a.rel="noopener noreferrer nofollow";el.appendChild(a)}else el.appendChild(document.createTextNode(s))})}
 function openCm(key,title){
@@ -233,9 +270,9 @@ try{var r=JSON.parse(store("e36"));if(r&&r.car&&r.picks)S=r}catch(e){}
 $("car").value=S.car;render();
 var PRE=[
 ["Budget drift 328i","Seat time first: cooling, diff, coilovers, tires.",["Cat-back exhaust (Supersprint style)","Full cooling overhaul kit (plastics, pump, hoses)","Stage 1 clutch (organic)","3.15 limited-slip (clutch-type LSD)","KW V1 coilovers","17x8.5 Apex SM-10 flow-formed","Budget all-season / drift tires","Bucket seats (Recaro / Corbeau)"]],
-["Track day turbo M52","Small turbo on a reliable M52 with a solid supporting list.",["Turbo kit, small (about 8 psi)","Standalone ECU (MS3Pro / Haltech) + tune","Larger injectors + adjustable regulator","CSF aluminum radiator + overhaul","Stage 3 clutch + lightweight flywheel","Torsen / Quaife helical LSD","Ground Control coilovers + camber plates","17x9 Enkei RPF1","Falken Azenis RT615K+ (200tw)","Stainless lines + ATE Typ 200 + track pads","Bucket seats (Recaro / Corbeau)"]],
-["S54 sleeper","E46 M3 engine and six-speed in a clean-looking 328i.",["S54 3.2L (E46 M3) swap","ZF 6-speed (E46 M3) swap","Radiator, oil cooler and fan kit","Torsen / Quaife helical LSD","KW V1 coilovers","17x9 Enkei RPF1","Michelin Pilot Sport 4S","Zimmermann rotors + Hawk HPS pads"]],
-["LS3 monster","430 hp V8, T56 and the parts to back it up.",["LS3 V8 swap (crate, 430 hp)","Tremec T56 swap + adapter","Radiator, oil cooler and fan kit","Kaaz-style 2-way LSD + new axles","Ground Control coilovers + camber plates","18x9.5 forged (staggered / square)","Toyo Proxes R888R (R-compound)","Big brake kit (Brembo / StopTech)","Strip interior + bolt-in 6-point cage"]]];
+["Track day turbo M52","Small turbo on a reliable M52 with a solid supporting list.",["Turbo kit, small (about 8 psi)","Standalone ECU (MS3Pro / Haltech) + tune","Larger injectors + adjustable regulator","CSF aluminum radiator + overhaul","Stage 3 clutch + lightweight flywheel","Torsen / Quaife helical LSD","Ground Control coilovers + camber plates","17x9 Enkei RPF1","Falken Azenis RT615K+ (200tw)","Stainless lines + ATE Typ 200 + track pads","Rear subframe reinforcement plates (weld-in)","Bucket seats (Recaro / Corbeau)"]],
+["S54 sleeper","E46 M3 engine and six-speed in a clean-looking 328i.",["S54 3.2L (E46 M3) swap","ZF 6-speed (E46 M3) swap","Radiator, oil cooler and fan kit","Torsen / Quaife helical LSD","KW V1 coilovers","17x9 Enkei RPF1","Michelin Pilot Sport 4S","Rear subframe reinforcement plates (weld-in)","Zimmermann rotors + Hawk HPS pads"]],
+["LS3 monster","430 hp V8, T56 and the parts to back it up.",["LS3 V8 swap (crate, 430 hp)","Tremec T56 swap + adapter","Radiator, oil cooler and fan kit","Kaaz-style 2-way LSD + new axles","Ground Control coilovers + camber plates","18x9.5 forged (staggered / square)","Toyo Proxes R888R (R-compound)","Big brake kit (Brembo / StopTech)","Subframe reinforcement + shock tower braces + seam welding","Strip interior + bolt-in 6-point cage"]]];
 var GD=[["E36 cooling overhaul","E36 cooling system overhaul"],["M52 turbo builds","E36 M52 turbo build"],["S54 swap threads","E36 S54 swap"],["LS swap threads","E36 LS swap"],["Best first mods","E36 best first mods"],["Track prep","E36 track day prep"]];
 function byName(n){return P.filter(function(p){return p.name===n})[0]}
 function tot(cid,ps){var c=CARS.filter(function(x){return x[0]===cid})[0],hp=c[3],lb=c[4],cost=c[2],e=ps.filter(function(p){return p.cat==="engine"})[0];
