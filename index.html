@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>E36 Part Picker</title>
+<title>Car Part Picker</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#eceae4;--surface:#fbfaf7;--ink:#14232b;--muted:#5d6b72;--line:#d3d0c6;--accent:#f2b705;--bad:#b3261e;--good:#1d7a46;--warn:#9a6700;--link:#1a5fb4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -61,12 +61,12 @@ footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);fon
 </style>
 </head>
 <body>
-<nav class="top"><div><a class="brand" href="#home">E36 Part Picker</a><a href="#builder">System Builder</a><button data-go="featured">Completed builds</button><button data-go="cats">Browse parts</button><button data-go="guides">Guides</button><button id="navcm">Discussion</button><a class="start" href="#builder">Start your build</a></div></nav>
+<nav class="top"><div><a class="brand" href="#home">Car Part Picker</a><button data-go="platforms">Platforms</button><button data-go="featured">Completed builds</button><button data-go="guides">Guides</button><button id="navcm">Discussion</button><button class="start" data-go="platforms">Start your build</button></div></nav>
 <div id="home"><div class="wrap">
-<section class="hero"><div><h1>Pick parts. Build your E36. Share it.</h1><p>Choose a chassis, add parts for every system, and see cost, power and weight add up. Compatibility checks catch missing supporting mods before you spend the money.</p><p><a class="btn pick big" href="#builder">Start your build</a></p></div><div class="card snap"><span class="sub">Your current build</span><div id="snapname" style="font-weight:600"></div><div class="g" id="snapnums"></div><a href="#builder">Open in builder</a></div></section>
+<section class="hero"><div><h1>Pick parts. Build your car. Share it.</h1><p>Plan a project car part by part, from engine swaps to tires. See cost, power and weight add up, and catch missing supporting mods before you spend the money.</p><p><button class="pick big" data-go="platforms">Start your build</button></p></div><div class="card snap"><span class="sub">Your current build</span><div id="snapname" style="font-weight:600"></div><div class="g" id="snapnums"></div><a href="#builder">Continue your E36 build</a></div></section>
 <section class="three"><div class="card"><h2>Pick parts</h2><p class="sub">Engines, turbos, suspension, brakes and more, each with price, power and weight.</p></div><div class="card"><h2>Check compatibility</h2><p class="sub">Get warned about fuel, cooling, clutch, diff and brake gaps for your power level.</p></div><div class="card"><h2>Share and discuss</h2><p class="sub">Every part links to shops, real builds and a shared comment thread.</p></div></section>
+<section class="sec" id="platforms"><h2>Choose your platform</h2><div class="cards" id="tiles"></div></section>
 <section class="sec" id="featured"><h2>Completed builds</h2><div class="cards" id="pre"></div></section>
-<section class="sec" id="cats"><h2>Browse parts</h2><div class="cards" id="tiles"></div></section>
 <section class="sec" id="guides"><h2>Guides and build threads</h2><div class="cards" id="gd"></div></section>
 </div></div>
 <div id="builder" hidden>
@@ -85,7 +85,7 @@ footer{border-top:1px solid var(--line);padding:18px 20px;color:var(--muted);fon
 <section class="card notes"><h2>Compatibility and notes</h2><ul id="notes"></ul></section>
 <p class="sub">Prices and power gains are rough US estimates for planning. Shop and build links open searches on other sites, so check fitment (year, engine, transmission) before buying. Check local emissions and noise laws.</p>
 </main></div>
-<footer>E36 Part Picker is an independent fan project. Prices are estimates and not affiliated with any shop or brand.</footer>
+<footer>Car Part Picker is an independent fan project. Prices are estimates and not affiliated with any shop or brand.</footer>
 <dialog id="dlg"><div class="dh"><h2 id="dt"></h2><input id="q" type="search" placeholder="Search" aria-label="Search parts"><select id="sort" aria-label="Sort"><option value="n">Name</option><option value="p">Price</option><option value="h">Power</option></select><button id="close">Close</button></div><div id="list"></div></dialog>
 <dialog id="cdlg"><div class="dh"><h2 id="ct"></h2><button id="cclose">Close</button></div><div id="clist"></div><div class="form"><input id="cn" placeholder="Your name or handle" maxlength="40" aria-label="Your name"><textarea id="cx" rows="3" maxlength="1500" placeholder="Share your experience, fitment tips, or paste a link to your build thread or video" aria-label="Comment"></textarea><div class="row"><button id="cpost" class="pick">Post comment</button><span class="sub" id="cmsg"></span></div></div></dialog>
 <div id="toast" role="status"></div>
@@ -243,9 +243,9 @@ function tot(cid,ps){var c=CARS.filter(function(x){return x[0]===cid})[0],hp=c[3
 function nums(t){return [[usd(t.cost),"cost"],[t.hp+" hp","power"],[(t.lb/t.hp).toFixed(1),"lb/hp"]].map(function(x){return "<div><b style='font-size:26px'>"+x[0]+"</b><div class='sub'>"+x[1]+"</div></div>"}).join("")}
 function snap(){var ps=Object.keys(S.picks).map(function(k){return P[S.picks[k]]});$("snapname").textContent=car()[1]+", "+ps.length+" parts";$("snapnums").innerHTML=nums(tot(S.car,ps))}
 var _r=render;render=function(){_r();snap()};snap();
-$("pre").innerHTML=PRE.map(function(b,i){return "<div class='card'><h3>"+b[0]+"</h3><p class='sub'>"+b[1]+"</p><div class='g' style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0'>"+nums(tot("328",b[2].map(byName)))+"</div><button class='pick' data-pre='"+i+"'>Load in builder</button></div>"}).join("");
-$("tiles").innerHTML=CATS.map(function(k){var n=P.filter(function(p){return p.cat===k[0]}).length;return "<button class='tile' data-cat='"+k[0]+"'><b>"+k[1]+"</b><span class='sub'>"+n+" parts</span></button>"}).join("");
-$("gd").innerHTML=GD.map(function(g){return "<div class='card'><h3>"+g[0]+"</h3><div class='row'><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.youtube.com/results?search_query="+encodeURIComponent(g[1])+"'>Videos</a><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.reddit.com/r/E36/search/?restrict_sr=1&q="+encodeURIComponent(g[1])+"'>r/E36</a></div></div>"}).join("");
+$("pre").innerHTML=PRE.map(function(b,i){return "<div class='card'><h3>"+b[0]+"</h3><span class='sub'>BMW E36</span><p class='sub'>"+b[1]+"</p><div class='g' style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0'>"+nums(tot("328",b[2].map(byName)))+"</div><button class='pick' data-pre='"+i+"'>Load in builder</button></div>"}).join("");
+$("tiles").innerHTML=[["BMW E36","1992–1999 · "+P.length+" parts · 3 models"],["Mazda MX-5 Miata","NA / NB / NC"],["Nissan 240SX","S13 / S14"],["Honda Civic / Integra","EG / EK / DC2"],["Toyota AE86 / Supra","4A-GE and 2JZ builds"],["Subaru WRX / STI","EJ20 / EJ25 builds"]].map(function(k,i){return i?"<button class='tile' disabled><b>"+k[0]+"</b><span class='sub'>"+k[1]+" · Coming soon</span></button>":"<a class='btn tile pick' href='#builder'><b>"+k[0]+"</b><span>"+k[1]+" · Open part picker</span></a>"}).join("");
+$("gd").innerHTML="<div class='card'><h3>BMW E36 build guide</h3><p class='sub'>Part picker, compatibility checks and discussion for the 328i, 325i and M3.</p><a class='btn pick' href='#builder'>Open E36 part picker</a></div>"+GD.map(function(g){return "<div class='card'><h3>"+g[0]+"</h3><div class='row'><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.youtube.com/results?search_query="+encodeURIComponent(g[1])+"'>Videos</a><a class='btn' target='_blank' rel='noopener noreferrer' href='https://www.reddit.com/r/E36/search/?restrict_sr=1&q="+encodeURIComponent(g[1])+"'>r/E36</a></div></div>"}).join("");
 function route(){var b=location.hash==="#builder";$("home").hidden=b;$("builder").hidden=!b;window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);route();
 document.addEventListener("click",function(e){var t=e.target;
