@@ -28,3 +28,22 @@
 .inline-price-input{width:104px;max-width:100%;padding:5px 7px;border:1px solid var(--accent);background:var(--surface2);color:var(--text);border-radius:5px;text-align:right}
 .inline-price-input.invalid{border-color:var(--danger)}
 .inline-price-reset{border:0;background:transparent;color:var(--muted);font-size:10px;text-decoration:underline;padding:0 5px}
+
+/* Vehicle imagery and selected-part details */
+.vehicle-photo{position:relative;overflow:hidden;border:1px solid var(--border, #36414b);border-radius:12px;background:linear-gradient(130deg,#26353d,#111b22);min-height:190px;display:flex;align-items:center;justify-content:center;margin:14px 0;}
+.vehicle-photo img{display:block;width:100%;height:245px;object-fit:cover;object-position:center;}
+.vehicle-photo-fallback{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#aab6bf;padding:40px 0;}
+.vehicle-photo-credit{position:absolute;bottom:9px;right:10px;font-size:11px;background:rgba(0,0,0,.75);color:#fff;border-radius:4px;padding:4px 7px;}
+.selected-part-link{border:0;background:none;color:inherit;font:inherit;font-weight:700;cursor:pointer;text-align:left;display:inline-flex;align-items:center;gap:7px;padding:0;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;}
+.selected-part-link:hover,.selected-part-link:focus-visible{color:#e6b935;text-decoration-color:currentColor;}
+.part-detail-dialog{background:var(--surface,#17242c);color:var(--text,#f3f5f6);width:min(680px,95vw);max-height:90vh;overflow:auto;border:1px solid #43505a;border-radius:14px;box-shadow:0 20px 70px #0009;}
+.part-detail-content{padding:22px;display:grid;gap:13px;}.part-detail-content h3{margin:8px 0 0;font-size:17px}.part-detail-content p{margin:0;line-height:1.6;color:inherit;opacity:.82}.part-detail-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.part-detail-metrics>div{padding:14px;border:1px solid #43505a;border-radius:8px;display:grid;gap:6px}.part-detail-metrics small{font-size:10px;opacity:.7}.part-detail-metrics strong{font-size:19px}.part-detail-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}.part-detail-note{padding:12px;border-left:3px solid #e6b935;background:#7d7d7d1c}@media(max-width:550px){.part-detail-metrics{grid-template-columns:1fr}.vehicle-photo img{height:180px}}
+
+/* Consistent vehicle imagery: show the entire car without stretching or cropping. */
+.vehicle-photo{aspect-ratio:16/9;min-height:0;width:100%;isolation:isolate}
+.vehicle-photo img{width:100%;height:100%;position:absolute;inset:0;object-fit:contain;object-position:center;background:#17242d}
+.vehicle-photo-fallback{width:100%;min-height:100%;text-align:center;padding:24px;gap:8px}
+.vehicle-photo-fallback strong{font-size:17px;color:#e9eef0}
+.vehicle-photo-fallback span{font-size:12px;max-width:90%}
+.vehicle-photo-credit{z-index:1;max-width:calc(100% - 20px);text-align:right}
+@media(max-width:550px){.vehicle-photo{aspect-ratio:4/3}.vehicle-photo img{height:100%}}

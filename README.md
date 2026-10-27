@@ -46,3 +46,26 @@ In System Builder, each selected part has an editable **Your price ($)** field. 
 ## Expanded vehicle selector
 
 Includes 62 additional popular project-car profiles across multiple makes, plus the three original E36 variants (65 total). Base vehicle selection works in the builder and saved builds. The new profiles include approximate stock horsepower and weight, but **do not include verified parts fitment or purchase prices**. The original E36 parts catalog is not marked compatible with other vehicles; add custom parts for those builds. Vehicle profiles live in `src/vehicles.json`.
+
+
+## New: Vehicle photos and part details
+The selected base vehicle shows a reference photo fetched from the Wikipedia API when available (requires internet). A fallback car illustration appears when no image is available. Images are illustrative and may not match the exact year/trim. Click a selected part name in the builder to open details, preliminary fitment, specifications, and research links.
+
+
+## Accurate vehicle photos
+Vehicle images are now opt-in curated records in `src/vehicle-images.json`, keyed by the exact vehicle ID from `src/vehicles.json` (or `328`, `325`, `m3` for the original E36s). Automatic Wikipedia search images were removed because they sometimes showed a different generation or model year. Until a photo is verified, the builder shows a labeled placeholder rather than an incorrect car.
+
+Example entry (replace with a licensed local image you have verified):
+```json
+{
+  "platform-001": {
+    "src": "/vehicles/bmw-e30-1990.jpg",
+    "year": 1990,
+    "make": "BMW",
+    "model": "E30 325i",
+    "credit": "Photographer / license",
+    "verified": true
+  }
+}
+```
+Put the corresponding file in `public/vehicles/`. The year must be within the vehicle profile's year range and the make/model must match. When selecting photographs, verify the body style, generation, and model year from a reliable photo description. Keep source, photographer, and license records; comply with image licensing. Images use `object-fit: contain` inside consistent aspect-ratio frames so the full car stays visible.
