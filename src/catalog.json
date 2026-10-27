@@ -1,0 +1,594 @@
+{
+  "CARS": [
+    [
+      "328",
+      "1996 BMW 328i (M52B28)",
+      5500,
+      190,
+      3000
+    ],
+    [
+      "325",
+      "1992 BMW 325i (M50B25)",
+      4000,
+      189,
+      2900
+    ],
+    [
+      "m3",
+      "1995 BMW M3 (US S50B30)",
+      14000,
+      240,
+      3160
+    ]
+  ],
+  "CATS": [
+    [
+      "engine",
+      "Engine / swap"
+    ],
+    [
+      "boost",
+      "Forced induction"
+    ],
+    [
+      "intake",
+      "Intake"
+    ],
+    [
+      "exhaust",
+      "Headers / exhaust"
+    ],
+    [
+      "fuel",
+      "Fuel system"
+    ],
+    [
+      "cool",
+      "Cooling"
+    ],
+    [
+      "ecu",
+      "ECU / tune"
+    ],
+    [
+      "clutch",
+      "Clutch / flywheel"
+    ],
+    [
+      "trans",
+      "Transmission"
+    ],
+    [
+      "diff",
+      "Differential"
+    ],
+    [
+      "susp",
+      "Coilovers / shocks"
+    ],
+    [
+      "chassis",
+      "Chassis / subframe / bushings"
+    ],
+    [
+      "wheels",
+      "Wheels"
+    ],
+    [
+      "tires",
+      "Tires"
+    ],
+    [
+      "brakes",
+      "Brakes"
+    ],
+    [
+      "body",
+      "Seats / cage / aero"
+    ]
+  ],
+  "P": [
+    {
+      "cat": "engine",
+      "name": "M52B28 rebuild + VANOS refresh",
+      "price": 2500,
+      "hp": 190,
+      "lb": 0,
+      "tag": "",
+      "fits": "328",
+      "id": 0
+    },
+    {
+      "cat": "engine",
+      "name": "S52 3.2L (US M3) swap",
+      "price": 4500,
+      "hp": 240,
+      "lb": 20,
+      "tag": "swap",
+      "fits": "328,325",
+      "id": 1
+    },
+    {
+      "cat": "engine",
+      "name": "S50B30 3.0L (Euro M3, 286 hp) swap",
+      "price": 7000,
+      "hp": 286,
+      "lb": 20,
+      "tag": "swap",
+      "fits": "328,325,m3",
+      "id": 2
+    },
+    {
+      "cat": "engine",
+      "name": "S54 3.2L (E46 M3) swap",
+      "price": 12500,
+      "hp": 333,
+      "lb": 50,
+      "tag": "swap",
+      "fits": "328,325,m3",
+      "id": 3
+    },
+    {
+      "cat": "engine",
+      "name": "LS3 V8 swap (crate, 430 hp)",
+      "price": 14000,
+      "hp": 430,
+      "lb": 80,
+      "tag": "swap",
+      "fits": "328,325,m3",
+      "id": 4
+    },
+    {
+      "cat": "engine",
+      "name": "2JZ-GTE swap (stock turbos)",
+      "price": 12500,
+      "hp": 320,
+      "lb": 90,
+      "tag": "swap",
+      "fits": "328,325,m3",
+      "id": 5
+    },
+    {
+      "cat": "boost",
+      "name": "Turbo kit, small (about 8 psi)",
+      "price": 3200,
+      "hp": 70,
+      "lb": 35,
+      "tag": "boost",
+      "id": 6
+    },
+    {
+      "cat": "boost",
+      "name": "Turbo kit, Garrett G25-660 (about 14 psi)",
+      "price": 5500,
+      "hp": 150,
+      "lb": 40,
+      "tag": "boost",
+      "id": 7
+    },
+    {
+      "cat": "boost",
+      "name": "Turbo kit, Precision 6266 (about 20 psi)",
+      "price": 7500,
+      "hp": 260,
+      "lb": 45,
+      "tag": "boost",
+      "id": 8
+    },
+    {
+      "cat": "boost",
+      "name": "Centrifugal supercharger kit",
+      "price": 5800,
+      "hp": 90,
+      "lb": 45,
+      "tag": "boost",
+      "id": 9
+    },
+    {
+      "cat": "intake",
+      "name": "Cold air intake",
+      "price": 250,
+      "hp": 6,
+      "lb": 0,
+      "tag": "",
+      "id": 10
+    },
+    {
+      "cat": "intake",
+      "name": "Intake manifold (ported) + throttle body",
+      "price": 900,
+      "hp": 12,
+      "lb": 0,
+      "tag": "",
+      "id": 11
+    },
+    {
+      "cat": "intake",
+      "name": "Individual throttle bodies (ITBs)",
+      "price": 3500,
+      "hp": 25,
+      "lb": 0,
+      "tag": "",
+      "id": 12
+    },
+    {
+      "cat": "exhaust",
+      "name": "Cat-back exhaust (Supersprint style)",
+      "price": 1100,
+      "hp": 10,
+      "lb": -15,
+      "tag": "",
+      "id": 13
+    },
+    {
+      "cat": "exhaust",
+      "name": "Long-tube headers + cat-back",
+      "price": 2000,
+      "hp": 25,
+      "lb": -20,
+      "tag": "",
+      "id": 14
+    },
+    {
+      "cat": "exhaust",
+      "name": "Straight-pipe exhaust",
+      "price": 1200,
+      "hp": 28,
+      "lb": -35,
+      "tag": "loud",
+      "id": 15
+    },
+    {
+      "cat": "fuel",
+      "name": "Walbro 255 fuel pump",
+      "price": 120,
+      "hp": 0,
+      "lb": 0,
+      "tag": "fuel",
+      "id": 16
+    },
+    {
+      "cat": "fuel",
+      "name": "Larger injectors + adjustable regulator",
+      "price": 600,
+      "hp": 0,
+      "lb": 0,
+      "tag": "fuel",
+      "id": 17
+    },
+    {
+      "cat": "fuel",
+      "name": "Injector Dynamics ID1050x + rail + pump",
+      "price": 1800,
+      "hp": 0,
+      "lb": 0,
+      "tag": "fuel",
+      "id": 18
+    },
+    {
+      "cat": "cool",
+      "name": "Full cooling overhaul kit (plastics, pump, hoses)",
+      "price": 500,
+      "hp": 0,
+      "lb": 0,
+      "tag": "cool",
+      "id": 19
+    },
+    {
+      "cat": "cool",
+      "name": "CSF aluminum radiator + overhaul",
+      "price": 1100,
+      "hp": 0,
+      "lb": -5,
+      "tag": "cool",
+      "id": 20
+    },
+    {
+      "cat": "cool",
+      "name": "Radiator, oil cooler and fan kit",
+      "price": 1800,
+      "hp": 0,
+      "lb": 10,
+      "tag": "cool",
+      "id": 21
+    },
+    {
+      "cat": "ecu",
+      "name": "Dyno tune (stock ECU, chip/reflash)",
+      "price": 700,
+      "hp": 12,
+      "lb": 0,
+      "tag": "tune",
+      "id": 22
+    },
+    {
+      "cat": "ecu",
+      "name": "Standalone ECU (MS3Pro / Haltech) + tune",
+      "price": 2800,
+      "hp": 25,
+      "lb": 0,
+      "tag": "tune",
+      "id": 23
+    },
+    {
+      "cat": "clutch",
+      "name": "Stage 1 clutch (organic)",
+      "price": 450,
+      "hp": 0,
+      "lb": 0,
+      "tag": "clutch",
+      "id": 24
+    },
+    {
+      "cat": "clutch",
+      "name": "Stage 3 clutch + lightweight flywheel",
+      "price": 1200,
+      "hp": 0,
+      "lb": -15,
+      "tag": "clutch",
+      "id": 25
+    },
+    {
+      "cat": "clutch",
+      "name": "Twin-disc clutch kit",
+      "price": 2200,
+      "hp": 0,
+      "lb": -10,
+      "tag": "clutch",
+      "id": 26
+    },
+    {
+      "cat": "trans",
+      "name": "ZF 5-speed (stock, rebuilt)",
+      "price": 900,
+      "hp": 0,
+      "lb": 0,
+      "tag": "trans0",
+      "id": 27
+    },
+    {
+      "cat": "trans",
+      "name": "Getrag 420G 6-speed swap",
+      "price": 3500,
+      "hp": 0,
+      "lb": 40,
+      "tag": "trans",
+      "id": 28
+    },
+    {
+      "cat": "trans",
+      "name": "ZF 6-speed (E46 M3) swap",
+      "price": 4500,
+      "hp": 0,
+      "lb": 30,
+      "tag": "trans",
+      "id": 29
+    },
+    {
+      "cat": "trans",
+      "name": "Tremec T56 swap + adapter",
+      "price": 5500,
+      "hp": 0,
+      "lb": 90,
+      "tag": "trans",
+      "id": 30
+    },
+    {
+      "cat": "diff",
+      "name": "3.15 limited-slip (clutch-type LSD)",
+      "price": 900,
+      "hp": 0,
+      "lb": 10,
+      "tag": "lsd",
+      "id": 31
+    },
+    {
+      "cat": "diff",
+      "name": "Torsen / Quaife helical LSD",
+      "price": 1100,
+      "hp": 0,
+      "lb": 10,
+      "tag": "lsd",
+      "id": 32
+    },
+    {
+      "cat": "diff",
+      "name": "Kaaz-style 2-way LSD + new axles",
+      "price": 1800,
+      "hp": 0,
+      "lb": 15,
+      "tag": "lsd",
+      "id": 33
+    },
+    {
+      "cat": "susp",
+      "name": "Bilstein B6 shocks + Eibach springs",
+      "price": 800,
+      "hp": 0,
+      "lb": 0,
+      "tag": "susp",
+      "id": 34
+    },
+    {
+      "cat": "susp",
+      "name": "KW V1 coilovers",
+      "price": 1500,
+      "hp": 0,
+      "lb": 0,
+      "tag": "susp",
+      "id": 35
+    },
+    {
+      "cat": "susp",
+      "name": "Ground Control coilovers + camber plates",
+      "price": 1800,
+      "hp": 0,
+      "lb": 5,
+      "tag": "susp",
+      "id": 36
+    },
+    {
+      "cat": "chassis",
+      "name": "Powerflex bushing kit",
+      "price": 350,
+      "hp": 0,
+      "lb": 0,
+      "tag": "",
+      "id": 37
+    },
+    {
+      "cat": "chassis",
+      "name": "Hotchkis sway bars (front and rear)",
+      "price": 900,
+      "hp": 0,
+      "lb": 5,
+      "tag": "",
+      "id": 38
+    },
+    {
+      "cat": "chassis",
+      "name": "Adjustable control arms + camber plates",
+      "price": 1300,
+      "hp": 0,
+      "lb": 5,
+      "tag": "",
+      "id": 39
+    },
+    {
+      "cat": "wheels",
+      "name": "17x8.5 Apex SM-10 flow-formed",
+      "price": 1100,
+      "hp": 0,
+      "lb": -15,
+      "tag": "",
+      "id": 40
+    },
+    {
+      "cat": "wheels",
+      "name": "17x9 Enkei RPF1",
+      "price": 1400,
+      "hp": 0,
+      "lb": -18,
+      "tag": "",
+      "id": 41
+    },
+    {
+      "cat": "wheels",
+      "name": "18x9.5 forged (staggered / square)",
+      "price": 3800,
+      "hp": 0,
+      "lb": -12,
+      "tag": "",
+      "id": 42
+    },
+    {
+      "cat": "tires",
+      "name": "Michelin Pilot Sport 4S",
+      "price": 900,
+      "hp": 0,
+      "lb": 0,
+      "tag": "grip",
+      "id": 43
+    },
+    {
+      "cat": "tires",
+      "name": "Falken Azenis RT615K+ (200tw)",
+      "price": 750,
+      "hp": 0,
+      "lb": 0,
+      "tag": "grip",
+      "id": 44
+    },
+    {
+      "cat": "tires",
+      "name": "Toyo Proxes R888R (R-compound)",
+      "price": 1100,
+      "hp": 0,
+      "lb": 0,
+      "tag": "grip",
+      "id": 45
+    },
+    {
+      "cat": "tires",
+      "name": "Budget all-season / drift tires",
+      "price": 350,
+      "hp": 0,
+      "lb": 0,
+      "tag": "",
+      "id": 46
+    },
+    {
+      "cat": "brakes",
+      "name": "Zimmermann rotors + Hawk HPS pads",
+      "price": 600,
+      "hp": 0,
+      "lb": 0,
+      "tag": "brake",
+      "id": 47
+    },
+    {
+      "cat": "brakes",
+      "name": "Stainless lines + ATE Typ 200 + track pads",
+      "price": 650,
+      "hp": 0,
+      "lb": 0,
+      "tag": "brake",
+      "id": 48
+    },
+    {
+      "cat": "brakes",
+      "name": "Big brake kit (Brembo / StopTech)",
+      "price": 3200,
+      "hp": 0,
+      "lb": 15,
+      "tag": "brake",
+      "id": 49
+    },
+    {
+      "cat": "body",
+      "name": "Bucket seats (Recaro / Corbeau)",
+      "price": 1100,
+      "hp": 0,
+      "lb": -25,
+      "tag": "",
+      "id": 50
+    },
+    {
+      "cat": "body",
+      "name": "Strip interior + bolt-in 6-point cage",
+      "price": 2200,
+      "hp": 0,
+      "lb": -30,
+      "tag": "",
+      "id": 51
+    },
+    {
+      "cat": "body",
+      "name": "Front splitter + trunk wing",
+      "price": 900,
+      "hp": 0,
+      "lb": 10,
+      "tag": "",
+      "id": 52
+    },
+    {
+      "cat": "chassis",
+      "name": "Rear subframe reinforcement plates (weld-in)",
+      "price": 450,
+      "hp": 0,
+      "lb": 8,
+      "tag": "sub",
+      "id": 53
+    },
+    {
+      "cat": "chassis",
+      "name": "Subframe reinforcement + shock tower braces + seam welding",
+      "price": 1800,
+      "hp": 0,
+      "lb": 25,
+      "tag": "sub",
+      "id": 54
+    }
+  ]
+}
