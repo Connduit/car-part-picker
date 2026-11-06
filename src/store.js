@@ -1,0 +1,5 @@
+import {readFileSync,writeFileSync,renameSync,mkdirSync} from 'node:fs';import {dirname} from 'node:path';
+export class Store{constructor(f){this.f=f;this.d={builds:{},templates:{}};try{const j=JSON.parse(readFileSync(f,'utf8'));if(!j||typeof j.builds!=='object')throw new Error('bad shape');this.d={templates:{},...j}}catch(e){if(e.code!=='ENOENT')throw new Error(`Data file ${f} is unreadable; refusing to overwrite it (${e.message})`)}}
+save(){mkdirSync(dirname(this.f),{recursive:true});const t=`${this.f}.${process.pid}.tmp`;writeFileSync(t,JSON.stringify(this.d,null,1),{mode:0o600});renameSync(t,this.f)}
+get(id){return Object.hasOwn(this.d.builds,id)?this.d.builds[id]:undefined}put(b){this.d.builds[b.id]=b;this.save()}del(id){delete this.d.builds[id];this.save()}all(){return Object.values(this.d.builds)}
+tget(id){return Object.hasOwn(this.d.templates,id)?this.d.templates[id]:undefined}tput(t){this.d.templates[t.id]=t;this.save()}tdel(id){delete this.d.templates[id];this.save()}tall(){return Object.values(this.d.templates)}}

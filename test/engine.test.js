@@ -1,0 +1,17 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {evaluate,totals,validateBuild,encode,decode} from '../src/engine.js';
+const B=(vehicle,ids)=>({vehicle,budget:5000,taxPct:0,items:ids.map(id=>({id,qty:1,labor:0}))});
+const st=(b,id)=>evaluate(b).find(r=>r.id===id).status;
+test('no record -> Unknown, never Verified',()=>{assert.equal(st(B('brz',[3]),3),'Unknown');for(const r of evaluate(B('nb',[2,4])))assert.notEqual(r.status,'Verified Fitment')});
+test('bolt pattern mismatch -> Incompatible',()=>assert.equal(st(B('nb',[7]),7),'Incompatible'));
+test('turbo needs injectors+tune, resolves when added',()=>{assert.equal(st(B('nb',[1]),1),'Requires Modification');assert.equal(st(B('nb',[1,2,3]),1),'Likely Compatible')});
+test('two coilovers conflict',()=>assert.equal(st(B('nb',[4,5]),4),'Incompatible'));
+test('tire width vs wheel width',()=>{assert.equal(st(B('brz',[7,8]),8),'Requires Modification');assert.equal(st(B('nb',[6,8]),8),'Likely Compatible')});
+test('totals',()=>{const b=B('nb',[2,3]);b.items[0].qty=2;b.taxPct=10;const t=totals(b);assert.equal(t.parts,1740);assert.equal(t.total,1914);assert.equal(t.remaining,3086)});
+test('validation rejects bad input',()=>{assert.ok(validateBuild({vehicle:'x',budget:-1,items:[{id:99,qty:0}]}).length>=3);assert.deepEqual(validateBuild(B('nb',[2])),[])});
+test('share token round-trips and rejects junk',()=>{const b=B('nd',[2,4]);assert.deepEqual(decode(encode(b)),b);assert.throws(()=>decode(encode({vehicle:'zz',items:[]})))});
+test('wheel envelope: width and offset checks use sample ranges and stay unverified',()=>{const s=(v,ids,id)=>evaluate(B(v,ids)).find(r=>r.id===id);
+const r=s('nb',[6],6);assert.equal(r.status,'Requires Modification');assert.ok(r.reasons.some(x=>/width 9in/.test(x.why)));
+const ok=evaluate({vehicle:'brz',budget:1,items:[{id:7,qty:1}]})[0];assert.ok(!ok.reasons.some(x=>/Wheel envelope/.test(x.why)));assert.notEqual(ok.status,'Verified Fitment')});
+test('human-readable dependency message',()=>assert.match(evaluate(B('nb',[1]))[0].reasons.map(r=>r.why).join(),/larger fuel injectors, ECU tune/));
+test('prototype keys are not valid vehicles or parts',()=>{assert.ok(validateBuild({vehicle:'constructor',budget:1,items:[]}).includes('unknown vehicle'));assert.ok(validateBuild({vehicle:'nb',budget:1,items:[{id:'constructor',qty:1}]}).some(e=>/unknown part/.test(e)));assert.ok(validateBuild({vehicle:'__proto__',budget:1,items:[]}).length)});

@@ -1,0 +1,32 @@
+import {vehicles,parts} from './data.js';import {evaluateFitment} from './fitment.js';import {speedoErrPct,edgeShift} from './geometry.js';
+export const ORDER=['Incompatible','Requires Modification','Unknown','Likely Compatible','Verified Fitment'];
+export const TAGS={inj:'larger fuel injectors',tune:'ECU tune',w17:'17in+ wheels',cooling:'upgraded cooling',oilcool:'oil cooler',fpump:'upgraded fuel pump'};
+const ONE=['Suspension','Wheels','ECU'],lbl=n=>TAGS[n]||n,slotKey=p=>p.slot||(ONE.includes(p.cat)?p.cat:null),pick=(b,k)=>b.items.map(x=>parts[x.id]).find(q=>q&&q[k]);
+export const requiredTags=(p,v,b)=>[...new Set([...(p.needs||[]),...evaluateFitment(p,v,b.profile||{}).requires])];
+export const baseFit=(p,vid,profile={})=>{const v=vehicles[vid],f=evaluateFitment(p,v,profile);return p.bp&&p.bp!==v.bp?'Incompatible':f.status};
+// Each rule: (item,part,vehicle,build)=>result|result[]|null; result={status,why,src,conf,advisory?}. Advisories never change the item's status.
+// Add rules to extend; no other code changes. Rules return Unknown (never a guess) when the required data is missing.
+export const RULES=[
+(i,p,v,b)=>{const f=evaluateFitment(p,v,b.profile||{});return{status:f.status,why:f.why,src:f.src,conf:f.conf}},
+(i,p,v)=>p.bp&&p.bp!==v.bp?{status:'Incompatible',why:`Bolt pattern ${p.bp} vs ${v.bp}`,src:'vehicle spec',conf:'medium'}:null,
+(i,p,v,b)=>{const m=requiredTags(p,v,b).filter(n=>!b.items.some(x=>parts[x.id].tag===n));return m.length?{status:'Requires Modification',why:'Missing supporting parts: '+m.map(lbl).join(', '),src:'dependency rule',conf:'medium'}:null},
+(i,p,v,b)=>{const m=(p.recommends||[]).filter(n=>!b.items.some(x=>parts[x.id].tag===n));return m.length?{advisory:true,status:'Likely Compatible',why:'Recommended (not required) supporting parts: '+m.map(lbl).join(', '),src:'dependency rule',conf:'low'}:null},
+(i,p,v,b)=>{const k=slotKey(p),o=k&&b.items.find(x=>x!==i&&slotKey(parts[x.id])===k);return o?{status:'Incompatible',why:`Conflicts with ${parts[o.id].name} (only one per ${p.slot?'slot':p.cat})`,src:'conflict rule',conf:'medium'}:null},
+(i,p,v,b)=>{if(!p.tireW)return null;const w=pick(b,'wheelW');if(!w)return{status:'Unknown',why:'No wheel selected to check tire width',src:'none',conf:'none'};const x=w.wheelW*25.4;return p.tireW>=x-20&&p.tireW<=x+45?null:{status:'Requires Modification',why:`Tire ${p.tireW}mm outside typical range for ${w.wheelW}in wheel`,src:'rule of thumb',conf:'low'}},
+(i,p,v)=>{if(!p.wheelW)return null;if(!v.wheel)return{status:'Unknown',why:'No wheel envelope data for this vehicle',src:'none',conf:'none'};if(p.off==null)return{status:'Unknown',why:'Wheel offset not specified, so offset was not checked',src:'none',conf:'none'};const o=[];if(p.wheelW<v.wheel.w[0]||p.wheelW>v.wheel.w[1])o.push(`width ${p.wheelW}in outside sample range ${v.wheel.w.join('-')}in`);if(p.off<v.wheel.off[0]||p.off>v.wheel.off[1])o.push(`offset +${p.off} outside sample range +${v.wheel.off.join(' to +')}`);return o.length?{status:'Requires Modification',why:'Wheel envelope: '+o.join('; ')+' (may need fender work or spacers)',src:'sample vehicle wheel envelope (unverified)',conf:'low'}:null},
+(i,p,v,b)=>{const out=[];
+if(p.tire){const w=pick(b,'wheelDia');if(w&&w.wheelDia!==p.tire.dia)out.push({status:'Incompatible',why:`Tire is sized for ${p.tire.dia}in wheels but the selected wheel is ${w.wheelDia}in`,src:'exact geometry (rim diameter must match)',conf:'high'});
+if(v.stockTire){const e=speedoErrPct(p.tire,v.stockTire);if(Math.abs(e)>=1.5)out.push({advisory:true,status:'Likely Compatible',why:`Estimated speedometer error ${e>0?'+':''}${e.toFixed(1)}% vs stock tire (calculated from nominal sizes; not verified)`,src:'math estimate',conf:'medium'})}}
+if(p.wheelW&&p.off!=null&&p.wheel!==false){if(v.staggered)out.push({status:'Unknown',why:'Stock setup is staggered (different front/rear); wheel shift is not modeled',src:'none',conf:'none'});
+else if(!v.stock)out.push({status:'Unknown',why:'No stock wheel data, so edge shift cannot be estimated',src:'none',conf:'none'});
+else{const t=pick(b,'tire'),s=edgeShift(v.stock,{w:p.wheelW,off:p.off},t&&t.tire,v.stockTire),est=`outer edge ${s.tireOuter>=0?'+':''}${s.tireOuter.toFixed(0)} mm vs stock incl. tire width`;
+if(v.clear==null)out.push({status:'Unknown',why:`No fender clearance data for this vehicle, so rubbing risk is unknown (estimate: ${est})`,src:'math estimate',conf:'none'});
+else if(s.tireOuter>v.clear)out.push({status:'Requires Modification',why:`Estimated ${est}; sample clearance ${v.clear} mm. Likely needs rolled fenders or smaller wheel/tire (inner clearance not modeled)`,src:'math estimate vs sample clearance',conf:'low'});
+else out.push({advisory:true,status:'Likely Compatible',why:`Estimated ${est}; within sample clearance ${v.clear} mm (inner clearance not modeled)`,src:'math estimate vs sample clearance',conf:'low'})}}
+return out}];
+export function evaluate(build,rules=RULES){const v=Object.hasOwn(vehicles,build.vehicle)&&vehicles[build.vehicle];if(!v)throw new Error('unknown vehicle');
+return build.items.map(it=>{const p=parts[it.id],r=rules.flatMap(f=>{const x=f(it,p,v,build);return x?[].concat(x):[]}),core=r.filter(x=>!x.advisory),status=ORDER.find(s=>core.some(x=>x.status===s));return{id:it.id,status,overridden:!!it.override&&['Incompatible','Requires Modification','Unknown'].includes(status),reasons:r}})}
+export const totals=b=>{const c=i=>parts[i.id].price*i.qty+(i.labor||0),parts_=b.items.reduce((a,i)=>a+parts[i.id].price*i.qty,0),labor=b.items.reduce((a,i)=>a+(i.labor||0),0),tax=parts_*(b.taxPct||0)/100,opt=b.items.filter(i=>i.optional).reduce((a,i)=>a+c(i),0);return{parts:parts_,labor,tax,total:parts_+labor+tax,remaining:b.budget-(parts_+labor+tax),optional:opt,core:parts_+labor-opt}};
+export function validateBuild(b){const e=[];if(!b||typeof b!=='object')return['not an object'];if(!Object.hasOwn(vehicles,b.vehicle))e.push('unknown vehicle');if(!(b.budget>=0))e.push('budget must be >= 0');if(!Array.isArray(b.items))e.push('items required');else b.items.forEach((i,n)=>{if(!Object.hasOwn(parts,i.id))e.push(`item ${n}: unknown part`);if(!Number.isInteger(i.qty)||i.qty<1)e.push(`item ${n}: qty must be integer >= 1`)});return e}
+export const encode=b=>Buffer.from(JSON.stringify(b)).toString('base64url');
+export const decode=t=>{const b=JSON.parse(Buffer.from(t,'base64url').toString());const e=validateBuild(b);if(e.length)throw new Error(e.join('; '));return b};

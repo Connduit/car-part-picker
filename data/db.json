@@ -1,0 +1,102 @@
+{
+ "templates": {},
+ "builds": {
+  "c110ce1ffb": {
+   "name": "Budget street NB (sample build) (copy)",
+   "type": "Street",
+   "vehicle": "nb",
+   "budget": 6000,
+   "taxPct": 0,
+   "public": false,
+   "items": [
+    {
+     "id": 4,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    },
+    {
+     "id": 6,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    },
+    {
+     "id": 8,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    },
+    {
+     "id": 10,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    },
+    {
+     "id": 14,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    }
+   ],
+   "id": "c110ce1ffb",
+   "owner": "bd0082e99b58942a870fdbc327cf2882",
+   "createdAt": 1793154013699,
+   "updatedAt": 1793154013699
+  },
+  "b776e3e04f207d37": {
+   "name": "Untitled build",
+   "type": "Street",
+   "vehicle": "nd",
+   "budget": 5000,
+   "taxPct": 0,
+   "public": false,
+   "items": [
+    {
+     "id": 1,
+     "qty": 1,
+     "labor": 0,
+     "status": "Planned",
+     "note": "",
+     "override": "",
+     "retailer": "Sample Retailer A"
+    }
+   ],
+   "id": "b776e3e04f207d37",
+   "owner": "bd0082e99b58942a870fdbc327cf2882",
+   "createdAt": 1793154823198,
+   "updatedAt": 1793154827101
+  },
+  "4186fd4251ee3ff9": {
+   "name": "Untitled build",
+   "type": "Street",
+   "vehicle": "ap1",
+   "profile": {},
+   "catBudgets": {},
+   "budget": 5000,
+   "taxPct": 0,
+   "public": false,
+   "items": [],
+   "id": "4186fd4251ee3ff9",
+   "owner": "c7c01383438131052ff98b4d3dce1a3c",
+   "createdAt": 1793403334810,
+   "updatedAt": 1793403334810
+  }
+ }
+}

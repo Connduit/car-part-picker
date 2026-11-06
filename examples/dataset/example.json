@@ -1,0 +1,10 @@
+{
+ "meta":{"name":"EXAMPLE dataset (illustrative, not real data)","asOf":"2026-10-01"},
+ "parts":[
+  {"id":1001,"cat":"Wheels","name":"EXAMPLE 17x8 +35 5x100 wheel","price":999,"brand":"Example Co","bp":"5x100","wheelW":8,"off":35,"wheelDia":17,"tag":"w17","spec":{"Size":"17x8","Offset":"+35","Material":"Example"}},
+  {"id":1002,"cat":"Tires","name":"EXAMPLE 225/45R17 tire","price":150,"tire":"225/45R17","spec":{"Size":"225/45R17"}}],
+ "fitment":[
+  {"part":1001,"gen":"gr86","effect":"fits","confidence":"low","source":{"type":"illustrative_sample","name":"Example author"},"note":"Example record; replace with sourced data"}],
+ "offers":[
+  {"partId":1001,"retailer":"Example Retailer","price":{"amount":999,"currency":"USD"},"availability":"in_stock","url":null,"shippingAmount":null,"observedAt":"2026-10-01T00:00:00Z","source":{"provider":"example-file","type":"fixture","fixture":true,"label":"Example fixture file"}}]
+}
